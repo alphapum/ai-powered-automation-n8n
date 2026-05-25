@@ -349,29 +349,42 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 1. ที่ Set node กดปุ่ม **`+`**
 2. ค้นหา **`HTTP Request`** → คลิก
-3. ตั้งค่า:
-   - **Method:** `POST`
-   - **URL:** `https://api.line.me/v2/bot/message/push`
-   - **Authentication:** `Generic Credential Type` → `Header Auth`
-     - กด **Create New Credential**:
-       - **Name:** `LINE Messaging API - KU Workshop`
-       - **Header Name:** `Authorization`
-       - **Header Value:** `Bearer <Channel Access Token จาก 6.3>`
-       - กด **Save**
-   - **Send Body:** เปิด toggle
-   - **Body Content Type:** `JSON`
-   - **Specify Body:** `Using JSON`
-   - **JSON:**
-     ```json
-     {
-       "to": "U1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6",
-       "messages": [
-         {
-           "type": "text",
-           "text": "{{ $json.message }}"
-         }
-       ]
-     }
+3. ตั้งค่าตามลำดับ UI (จากบนลงล่าง):
+
+| # | ช่อง | ค่า |
+|---|------|-----|
+| 1 | **Method** | `POST` |
+| 2 | **URL** | `https://api.line.me/v2/bot/message/push` |
+| 3 | **Authentication** | `Generic Credential Type` |
+| 4 | **Generic Auth Type** | `Header Auth` |
+| 5 | **Header Auth** | กด **Set up credential** (ดูข้างล่าง) |
+| 6 | **Send Body** | ✅ เปิด toggle |
+| 7 | **Body Content Type** | `JSON` |
+| 8 | **Specify Body** | `Using JSON` |
+| 9 | **JSON** | (วาง JSON ข้างล่าง) |
+
+**สร้าง Credential (ขั้นตอน 5):**
+
+- กด **Set up credential** → กด **Create New**
+- ใส่:
+  - **Name:** `LINE Messaging API - KU Workshop`
+  - **Header Auth → Name:** `Authorization`
+  - **Header Auth → Value:** `Bearer <Channel Access Token จาก 6.4>`
+- กด **Save**
+
+> ⚠️ **สำคัญ:** ต้องเป็น `Bearer` (B ใหญ่) + เว้นวรรค 1 ครั้ง + Token เลย — ห้ามมี space หน้า/หลัง
+
+**JSON Body (ขั้นตอน 9):**
+```json
+{
+  "to": "U1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6",
+  "messages": [
+    {
+      "type": "text",
+      "text": "{{ $json.message }}"
+    }
+  ]
+}
      ```
    - **แทน `U1a2b3...` ด้วย Your user ID ของคุณ** (จาก Step 6.4)
 
