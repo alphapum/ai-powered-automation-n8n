@@ -1,0 +1,74 @@
+# LaTeX source files (private — distribute PDF only)
+*.tex
+*.sty
+Slides/_common/
+Slides/_theme/
+Slides/_assets/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+
+# Audit/temp files
+_audit/
+_verify/
+verify-*.png
+check-*.png
+preview*.png
+temp.*
+*-tmp.*
+S1tmp.*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Secrets (NEVER commit these!)
+.env
+*.secret
+credentials.json
+*_credentials.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node (in case anyone tries it)
+node_modules/
+
+# Local workflow exports (use solution/ instead)
+my-workflow*.json
+*-export.json
+
+# CI workflow (no longer needed — PDF pre-built)
+.github/workflows/build-slides.yml
+
+# Admin setup guide (private)
+SETUP_GITHUB.md
+
+# Temp preview images
+p1.png
+p2.png
+
+# Private — instructor only (DO NOT commit)
+Scripts/
+Handouts/
+Tests/

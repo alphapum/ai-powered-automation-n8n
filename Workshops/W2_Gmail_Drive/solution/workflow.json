@@ -1,0 +1,214 @@
+{
+  "name": "W2-รวบรวมไฟล์-Solution",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "n01-schedule",
+      "name": "Schedule (ทุก 15 นาที)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "simple": true,
+        "filters": {
+          "q": "subject:[ส่งงาน] is:unread has:attachment"
+        }
+      },
+      "id": "n02-gmail-search",
+      "name": "Gmail: ค้นหา email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [460, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CRED_ID",
+          "name": "Gmail - Workshop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-attachment",
+              "leftValue": "={{ $json.attachments.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "n03-if",
+      "name": "IF: มี attachment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "format": "resolved",
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "n04-gmail-download",
+      "name": "Gmail: download attachment",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [900, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CRED_ID",
+          "name": "Gmail - Workshop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "={{ $('Gmail: ค้นหา email').item.json.subject }}_{{ $binary.attachment_0.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_YOUR_FOLDER_ID"
+        },
+        "options": {}
+      },
+      "id": "n05-drive-upload",
+      "name": "Drive: upload file",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1120, 200],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_DRIVE_CRED_ID",
+          "name": "Drive - Workshop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail: ค้นหา email').item.json.id }}"
+      },
+      "id": "n06-gmail-mark-read",
+      "name": "Gmail: mark as read",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1340, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CRED_ID",
+          "name": "Gmail - Workshop"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule (ทุก 15 นาที)": {
+      "main": [
+        [
+          {
+            "node": "Gmail: ค้นหา email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail: ค้นหา email": {
+      "main": [
+        [
+          {
+            "node": "IF: มี attachment?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: มี attachment?": {
+      "main": [
+        [
+          {
+            "node": "Gmail: download attachment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Gmail: download attachment": {
+      "main": [
+        [
+          {
+            "node": "Drive: upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drive: upload file": {
+      "main": [
+        [
+          {
+            "node": "Gmail: mark as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ku-workshop-2026-05-26",
+  "meta": {
+    "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
+    "description": "KU Workshop 2: Gmail → Drive. Replace 3 credential IDs + Drive folder ID after import."
+  },
+  "tags": [
+    {
+      "name": "ku-workshop-2026",
+      "id": "ku-w2"
+    }
+  ]
+}

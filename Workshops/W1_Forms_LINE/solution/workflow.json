@@ -1,0 +1,108 @@
+{
+  "name": "W1-คำร้องนิสิต-Solution",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ku-w1-student-request",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "n01-webhook",
+      "name": "Webhook (รับจาก Google Form)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "ku-w1-student-request"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "message",
+              "type": "stringValue",
+              "stringValue": "=📩 คำร้องใหม่จาก: {{ $json.name }}\nรหัส: {{ $json.student_id }}\nเรื่อง: {{ $json.topic }}\n\nรายละเอียด:\n{{ $json.detail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02-set",
+      "name": "Set (จัดข้อความ)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://notify-api.line.me/api/notify",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n03-http-line",
+      "name": "HTTP Request (LINE Notify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "LINE Notify - KU Workshop"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook (รับจาก Google Form)": {
+      "main": [
+        [
+          {
+            "node": "Set (จัดข้อความ)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set (จัดข้อความ)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (LINE Notify)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ku-workshop-2026-05-26",
+  "meta": {
+    "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
+    "description": "KU Workshop 1: Google Forms → LINE Notify. Replace LINE Notify credential ID after import. Apps Script snippet in GUIDE.md Step 3."
+  },
+  "tags": [
+    {
+      "name": "ku-workshop-2026",
+      "id": "ku-w1"
+    }
+  ]
+}

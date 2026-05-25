@@ -1,0 +1,150 @@
+{
+  "name": "Test-KU-LLM-Gateway",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "n01-trigger",
+      "name": "เริ่มทดสอบ (Manual)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apigw.ku.ac.th/llm2/v1/chat/completions",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"mistralai/Mistral-7B-Instruct-v0.3\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"อธิบาย n8n สั้นๆ 2-3 ประโยค เป็นภาษาไทย\"\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": false
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "n02-http-chat",
+      "name": "1) Test Chat Completion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apigw.ku.ac.th/llm/v1/embeddings",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"การทดสอบ embedding ภาษาไทย\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": false
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "n03-http-embed",
+      "name": "2) Test Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r01",
+              "name": "report",
+              "value": "=📊 KU LLM Gateway — Test Report\n=====================================\n🕒 Tested: {{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}\n\n┌─ Test 1: Chat Completion ──────────────────\n│ URL:     /llm2/v1/chat/completions\n│ Status:  {{ $('1) Test Chat Completion').item.json.choices ? '✅ PASS' : '❌ FAIL' }}\n│ Model:   {{ $('1) Test Chat Completion').item.json.model || 'unknown' }}\n│ Tokens:  prompt={{ $('1) Test Chat Completion').item.json.usage ? $('1) Test Chat Completion').item.json.usage.prompt_tokens : 0 }} | completion={{ $('1) Test Chat Completion').item.json.usage ? $('1) Test Chat Completion').item.json.usage.completion_tokens : 0 }} | total={{ $('1) Test Chat Completion').item.json.usage ? $('1) Test Chat Completion').item.json.usage.total_tokens : 0 }}\n│ Finish:  {{ $('1) Test Chat Completion').item.json.choices ? $('1) Test Chat Completion').item.json.choices[0].finish_reason : 'n/a' }}\n│ Reply:   {{ $('1) Test Chat Completion').item.json.choices ? $('1) Test Chat Completion').item.json.choices[0].message.content : 'no response' }}\n└─────────────────────────────────────────────\n\n┌─ Test 2: Embeddings ───────────────────────\n│ URL:     /llm/v1/embeddings  (note: no '2'!)\n│ Status:  {{ $json.data ? '✅ PASS' : '❌ FAIL' }}\n│ Model:   {{ $json.model || 'unknown' }}\n│ Vector:  {{ $json.data ? $json.data[0].embedding.length : 0 }} dims\n│ Tokens:  {{ $json.usage ? $json.usage.prompt_tokens : 0 }}\n│ Sample:  {{ $json.data ? JSON.stringify($json.data[0].embedding.slice(0, 5)) : 'n/a' }}\n└─────────────────────────────────────────────\n\n{{ ($('1) Test Chat Completion').item.json.choices && $json.data) ? '🎉 ALL TESTS PASSED — Gateway healthy' : '⚠️ SOME TESTS FAILED' }}",
+              "type": "string"
+            },
+            {
+              "id": "r02",
+              "name": "chat_status",
+              "value": "={{ $('1) Test Chat Completion').item.json.choices ? 'PASS' : 'FAIL' }}",
+              "type": "string"
+            },
+            {
+              "id": "r03",
+              "name": "embed_status",
+              "value": "={{ $json.data ? 'PASS' : 'FAIL' }}",
+              "type": "string"
+            },
+            {
+              "id": "r04",
+              "name": "overall_status",
+              "value": "={{ ($('1) Test Chat Completion').item.json.choices && $json.data) ? 'PASS' : 'FAIL' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04-report",
+      "name": "📋 สรุปผลทดสอบ",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [860, 400]
+    }
+  ],
+  "connections": {
+    "เริ่มทดสอบ (Manual)": {
+      "main": [
+        [
+          {
+            "node": "1) Test Chat Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1) Test Chat Completion": {
+      "main": [
+        [
+          {
+            "node": "2) Test Embeddings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2) Test Embeddings": {
+      "main": [
+        [
+          {
+            "node": "📋 สรุปผลทดสอบ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ku-llm-gateway-test-2026-05-23-v3",
+  "meta": {
+    "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
+    "description": "Test workflow v3.1 — confirmed URLs: Chat = /llm2/v1/chat/completions, Embed = /llm/v1/embeddings (different prefix! KU splits the services)"
+  }
+}

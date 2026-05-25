@@ -1,0 +1,191 @@
+{
+  "name": "W3-อวยพรวันเกิด-Solution",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "n01-schedule",
+      "name": "Schedule (ทุกวัน 9:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_YOUR_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "staff"
+        },
+        "options": {}
+      },
+      "id": "n02-sheets-read",
+      "name": "Google Sheets: read staff",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SHEETS_CRED_ID",
+          "name": "Sheets - Workshop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "birthday-today",
+              "leftValue": "={{ $json.birthday }}",
+              "rightValue": "={{ $now.toFormat('MM-dd') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "n03-if",
+      "name": "IF: เกิดวันนี้?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "n04-loop",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://notify-api.line.me/api/notify",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=🎉 สุขสันต์วันเกิดคุณ {{ $json.nickname }}!\nขออวยพรให้มีความสุข สุขภาพแข็งแรง 🎂\n\nจาก: ทีม {{ $json.department }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n05-http-line",
+      "name": "HTTP Request (LINE Notify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_YOUR_LINE_CRED_ID",
+          "name": "LINE Notify - KU Workshop"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule (ทุกวัน 9:00)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: read staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: read staff": {
+      "main": [
+        [
+          {
+            "node": "IF: เกิดวันนี้?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: เกิดวันนี้?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request (LINE Notify)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (LINE Notify)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ku-workshop-2026-05-27",
+  "meta": {
+    "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
+    "description": "KU Workshop 3: Schedule + Sheets + IF + LINE Notify. Send birthday wishes daily at 9:00. Replace 2 credential IDs + Sheet ID after import."
+  },
+  "tags": [
+    {
+      "name": "ku-workshop-2026",
+      "id": "ku-w3"
+    }
+  ]
+}

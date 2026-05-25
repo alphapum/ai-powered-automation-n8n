@@ -1,0 +1,494 @@
+{
+  "name": "Find-KU-Embedding-URL",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "n01",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 600]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u01",
+              "name": "url",
+              "value": "https://apigw.ku.ac.th/llm2/v1/embeddings",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02a",
+      "name": "URL A: /llm2/v1/embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u02",
+              "name": "url",
+              "value": "https://apigw.ku.ac.th/llm/v1/embeddings",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02b",
+      "name": "URL B: /llm/v1/embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u03",
+              "name": "url",
+              "value": "https://apigw.ku.ac.th/llm2/embeddings",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02c",
+      "name": "URL C: /llm2/embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 600]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u04",
+              "name": "url",
+              "value": "https://apigw.ku.ac.th/v1/embeddings",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02d",
+      "name": "URL D: /v1/embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 800]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u05",
+              "name": "url",
+              "value": "https://apigw.ku.ac.th/embeddings/v1/embeddings",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02e",
+      "name": "URL E: /embeddings/v1/embeddings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 1000]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"test\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n03a",
+      "name": "Try A",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"test\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n03b",
+      "name": "Try B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"test\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n03c",
+      "name": "Try C",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"test\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n03d",
+      "name": "Try D",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 800]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"BAAI/bge-m3\",\n  \"input\": \"test\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n03e",
+      "name": "Try E",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 1000]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sa01",
+              "name": "url_tried",
+              "value": "={{ $('URL A: /llm2/v1/embeddings').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "sa02",
+              "name": "status_code",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "sa03",
+              "name": "result",
+              "value": "={{ $json.statusCode === 200 ? '✅ WORKS' : ($json.statusCode === 404 ? '❌ Not Found' : ($json.statusCode === 401 ? '🔐 Auth issue' : '⚠️ Error ' + $json.statusCode)) }}",
+              "type": "string"
+            },
+            {
+              "id": "sa04",
+              "name": "body_preview",
+              "value": "={{ JSON.stringify($json.body).substring(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04a",
+      "name": "Summarize A",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sb01",
+              "name": "url_tried",
+              "value": "={{ $('URL B: /llm/v1/embeddings').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "sb02",
+              "name": "status_code",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "sb03",
+              "name": "result",
+              "value": "={{ $json.statusCode === 200 ? '✅ WORKS' : ($json.statusCode === 404 ? '❌ Not Found' : ($json.statusCode === 401 ? '🔐 Auth issue' : '⚠️ Error ' + $json.statusCode)) }}",
+              "type": "string"
+            },
+            {
+              "id": "sb04",
+              "name": "body_preview",
+              "value": "={{ JSON.stringify($json.body).substring(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04b",
+      "name": "Summarize B",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sc01",
+              "name": "url_tried",
+              "value": "={{ $('URL C: /llm2/embeddings').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "sc02",
+              "name": "status_code",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "sc03",
+              "name": "result",
+              "value": "={{ $json.statusCode === 200 ? '✅ WORKS' : ($json.statusCode === 404 ? '❌ Not Found' : ($json.statusCode === 401 ? '🔐 Auth issue' : '⚠️ Error ' + $json.statusCode)) }}",
+              "type": "string"
+            },
+            {
+              "id": "sc04",
+              "name": "body_preview",
+              "value": "={{ JSON.stringify($json.body).substring(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04c",
+      "name": "Summarize C",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 600]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sd01",
+              "name": "url_tried",
+              "value": "={{ $('URL D: /v1/embeddings').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "sd02",
+              "name": "status_code",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "sd03",
+              "name": "result",
+              "value": "={{ $json.statusCode === 200 ? '✅ WORKS' : ($json.statusCode === 404 ? '❌ Not Found' : ($json.statusCode === 401 ? '🔐 Auth issue' : '⚠️ Error ' + $json.statusCode)) }}",
+              "type": "string"
+            },
+            {
+              "id": "sd04",
+              "name": "body_preview",
+              "value": "={{ JSON.stringify($json.body).substring(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04d",
+      "name": "Summarize D",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 800]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "se01",
+              "name": "url_tried",
+              "value": "={{ $('URL E: /embeddings/v1/embeddings').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "se02",
+              "name": "status_code",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "se03",
+              "name": "result",
+              "value": "={{ $json.statusCode === 200 ? '✅ WORKS' : ($json.statusCode === 404 ? '❌ Not Found' : ($json.statusCode === 401 ? '🔐 Auth issue' : '⚠️ Error ' + $json.statusCode)) }}",
+              "type": "string"
+            },
+            {
+              "id": "se04",
+              "name": "body_preview",
+              "value": "={{ JSON.stringify($json.body).substring(0, 200) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n04e",
+      "name": "Summarize E",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [920, 1000]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          { "node": "URL A: /llm2/v1/embeddings", "type": "main", "index": 0 },
+          { "node": "URL B: /llm/v1/embeddings", "type": "main", "index": 0 },
+          { "node": "URL C: /llm2/embeddings", "type": "main", "index": 0 },
+          { "node": "URL D: /v1/embeddings", "type": "main", "index": 0 },
+          { "node": "URL E: /embeddings/v1/embeddings", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "URL A: /llm2/v1/embeddings": {
+      "main": [[{ "node": "Try A", "type": "main", "index": 0 }]]
+    },
+    "URL B: /llm/v1/embeddings": {
+      "main": [[{ "node": "Try B", "type": "main", "index": 0 }]]
+    },
+    "URL C: /llm2/embeddings": {
+      "main": [[{ "node": "Try C", "type": "main", "index": 0 }]]
+    },
+    "URL D: /v1/embeddings": {
+      "main": [[{ "node": "Try D", "type": "main", "index": 0 }]]
+    },
+    "URL E: /embeddings/v1/embeddings": {
+      "main": [[{ "node": "Try E", "type": "main", "index": 0 }]]
+    },
+    "Try A": {
+      "main": [[{ "node": "Summarize A", "type": "main", "index": 0 }]]
+    },
+    "Try B": {
+      "main": [[{ "node": "Summarize B", "type": "main", "index": 0 }]]
+    },
+    "Try C": {
+      "main": [[{ "node": "Summarize C", "type": "main", "index": 0 }]]
+    },
+    "Try D": {
+      "main": [[{ "node": "Summarize D", "type": "main", "index": 0 }]]
+    },
+    "Try E": {
+      "main": [[{ "node": "Summarize E", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "find-embed-url-2026-05-23",
+  "meta": {
+    "description": "Probes 5 URL variants for KU LLM Gateway embeddings endpoint in parallel. Look for ✅ WORKS in any Summarize_X node output."
+  }
+}

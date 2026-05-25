@@ -1,0 +1,223 @@
+{
+  "name": "W5-สรุปเบิกจ่าย-AI-Solution",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "n01-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_YOUR_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sheet1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "approved"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n02-sheets",
+      "name": "Google Sheets: read expenses",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [420, 400],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SHEETS_CRED_ID",
+          "name": "Google Sheets - Workshop"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// อ่าน expense items ทั้งหมดจาก node ก่อนหน้า (Google Sheets)\nconst items = $input.all();\n\n// รวมยอดตามหมวด\nconst byCategory = {};\nlet grandTotal = 0;\n\nfor (const item of items) {\n  const row = item.json;\n  const category = (row.category || 'ไม่ระบุ').toString().trim();\n  const amount = Number(row.amount) || 0;\n\n  if (!byCategory[category]) {\n    byCategory[category] = { category, total: 0, count: 0 };\n  }\n  byCategory[category].total += amount;\n  byCategory[category].count += 1;\n  grandTotal += amount;\n}\n\n// แปลง object เป็น array เรียงจากมากไปน้อย\nconst categories = Object.values(byCategory).sort((a, b) => b.total - a.total);\n\n// หาเดือนของข้อมูล (จาก date แรกที่เจอ)\nconst firstDate = items[0]?.json?.date || '';\nconst month = (firstDate.toString()).slice(0, 7); // \"2026-05\"\n\n// สร้าง summary_text ให้ AI อ่าน\nconst summaryText = categories\n  .map(c => `- ${c.category}: ${c.total.toLocaleString('th-TH')} บาท (${c.count} รายการ)`)\n  .join('\\n');\n\n// คืนค่า 1 item ที่มีทุกอย่าง\nreturn [{\n  json: {\n    month: month,\n    grand_total: grandTotal,\n    item_count: items.length,\n    top_category: categories[0]?.category || 'n/a',\n    top_category_total: categories[0]?.total || 0,\n    categories: categories,\n    summary_text: summaryText\n  }\n}];"
+      },
+      "id": "n03-code",
+      "name": "Code: aggregate by category",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apigw.ku.ac.th/llm2/v1/chat/completions",
+        "authentication": "none",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"apikey\": \"YOUR_KU_LLM_API_KEY_HERE\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistralai/Mistral-7B-Instruct-v0.3\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"คุณคือผู้ช่วยวิเคราะห์ค่าใช้จ่ายของหน่วยงานราชการไทย จงสรุปข้อมูลที่ได้รับเป็นภาษาไทยเท่านั้น 3-4 ประโยค สำหรับผู้บริหารอ่าน:\\n- เน้นยอดรวมและหมวดที่ใช้มากที่สุด\\n- ระบุจุดผิดปกติ (ถ้ามี) เช่น หมวดที่ใช้สูงผิดปกติ\\n- ใช้ภาษาทางการ กระชับ ตรงประเด็น\\n- เขียนเป็นย่อหน้าเดียว ไม่ใช้ bullet points\\n- ห้ามคำนวณตัวเลขเอง ใช้ตัวเลขจากข้อมูลที่ให้มา\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"ข้อมูลค่าใช้จ่ายเดือน {{ $json.month }}:\\n\\nยอดรวมทั้งสิ้น: {{ $json.grand_total }} บาท ({{ $json.item_count }} รายการ)\\n\\nรายละเอียดตามหมวด:\\n{{ $json.summary_text }}\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"max_tokens\": 400\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "fullResponse": false
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "n04-http-llm",
+      "name": "HTTP: KU LLM Gateway (สรุปด้วย AI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s01",
+              "name": "email_subject",
+              "value": "=[สรุปเบิกจ่าย] เดือน {{ $('Code: aggregate by category').item.json.month }} - ยอดรวม {{ $('Code: aggregate by category').item.json.grand_total.toLocaleString('th-TH') }} บาท",
+              "type": "string"
+            },
+            {
+              "id": "s02",
+              "name": "email_body",
+              "value": "=เรียน ผู้บริหาร\n\nสรุปการเบิกจ่ายของหน่วยงานในเดือน {{ $('Code: aggregate by category').item.json.month }}:\n\n━━━ AI Summary ━━━\n{{ $json.choices[0].message.content }}\n\n━━━ รายละเอียดตามหมวด ━━━\n{{ $('Code: aggregate by category').item.json.summary_text }}\n\n━━━ รวมทั้งสิ้น ━━━\n{{ $('Code: aggregate by category').item.json.grand_total.toLocaleString('th-TH') }} บาท ({{ $('Code: aggregate by category').item.json.item_count }} รายการ)\n\nจัดทำโดยระบบอัตโนมัติ n8n + KU LLM Gateway\nส่งเมื่อ {{ $now.toFormat('yyyy-MM-dd HH:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "s03",
+              "name": "ai_summary",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "s04",
+              "name": "tokens_used",
+              "value": "={{ $json.usage ? $json.usage.total_tokens : 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "n05-set",
+      "name": "Set: format email body",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1080, 400]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "REPLACE_WITH_RECIPIENT_EMAIL@ku.ac.th",
+        "subject": "={{ $json.email_subject }}",
+        "emailType": "text",
+        "message": "={{ $json.email_body }}",
+        "options": {}
+      },
+      "id": "n06-gmail",
+      "name": "Gmail: ส่งสรุปให้ผู้บริหาร",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1300, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CRED_ID",
+          "name": "Gmail - Workshop"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: read expenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: read expenses": {
+      "main": [
+        [
+          {
+            "node": "Code: aggregate by category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code: aggregate by category": {
+      "main": [
+        [
+          {
+            "node": "HTTP: KU LLM Gateway (สรุปด้วย AI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: KU LLM Gateway (สรุปด้วย AI)": {
+      "main": [
+        [
+          {
+            "node": "Set: format email body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: format email body": {
+      "main": [
+        [
+          {
+            "node": "Gmail: ส่งสรุปให้ผู้บริหาร",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ku-workshop-2026-05-27-w5",
+  "meta": {
+    "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
+    "description": "KU Workshop 5: AI-Powered Monthly Expense Summary. Uses KU LLM Gateway (apigw.ku.ac.th/llm2/v1) with Mistral-7B-Instruct-v0.3. Replace: Sheets credential + Sheet ID + Gmail credential + recipient email + rotate KU LLM API key to n8n credential before production."
+  },
+  "tags": [
+    {
+      "name": "ku-workshop-2026",
+      "id": "ku-w5"
+    },
+    {
+      "name": "ai-powered",
+      "id": "ai"
+    }
+  ]
+}
