@@ -230,27 +230,54 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 > 💡 Provider = "องค์กร" ที่จะเป็นเจ้าของ Bot — ใช้ของตัวเองได้เลย
 
-### 6.2 สร้าง Messaging API Channel (3 นาที)
+### 6.2 สร้าง Messaging API Channel (5 นาที)
 
-1. คลิกที่ Provider ที่เพิ่งสร้าง → tab **Channels**
-2. กด **Create a new channel** → เลือก **Messaging API**
-3. กรอกข้อมูล:
-   - **Channel name:** `KU-W1-[ชื่อคุณ]`
-   - **Channel description:** `Workshop Bot`
-   - **Category:** Education
-   - **Subcategory:** University
-   - **Region:** Thailand
-4. ยอมรับ Terms → **Create**
+> ⚠️ **UI ใหม่:** LINE รวม flow สร้าง Channel เข้ากับการสร้าง LINE Official Account (OA) ผ่าน UI ภาษาไทย — กดสร้าง channel แล้วจะถูก redirect ไป OA Manager
 
-### 6.3 รับ Channel Access Token (1 นาที)
+**A. เริ่มสร้าง Channel:**
+1. คลิกที่ Provider ที่สร้างไว้ → tab **Channels**
+2. คลิกที่ icon **Create a Messaging API channel** (icon ที่ 2 มีรูปจอ+มือถือ+กล่องแชท)
+3. LINE จะ **redirect ไปหน้าสร้าง LINE Official Account** (Thai UI)
 
-1. ในหน้า Channel ที่เพิ่งสร้าง → tab **Messaging API**
-2. เลื่อนลงหา section **Channel access token (long-lived)**
-3. กด **Issue** → token จะแสดง
-4. **Copy เก็บไว้** (ยาว ~170 ตัวอักษร)
+**B. ขั้นที่ 1/3 — กรอกข้อมูล:**
+| ช่อง (ภาษาไทย) | ใส่ |
+|---|---|
+| ชื่อบัญชี ● | `KU-W1-[ชื่อคุณ]` (เช่น `KU-W1-Kong`) |
+| อีเมล ● | email ของคุณ |
+| ประเทศที่ตั้งบริษัท & ธุรกิจ ● | ไทย |
+| ชื่อบริษัท/ธุรกิจ | `KU-OCS` |
+| ประเภทธุรกิจ ● | การศึกษา → อุดมศึกษา |
 
-> ⚠️ **Token = รหัสผ่าน!** อย่า commit ขึ้น Git / share ในที่สาธารณะ
+> ● = ต้องระบุ
+
+กดปุ่ม **ตกลง** (สีเขียว)
+
+**C. ขั้นที่ 2/3 — ตรวจสอบรายละเอียด:**
+- ตรวจข้อมูลทั้งหมด → กด **เสร็จสิ้น**
+
+**D. ขั้นที่ 3/3 — สำเร็จ!**
+- เห็นข้อความ "สร้าง LINE ออฟฟิเชียลแอคเคาท์แล้ว"
+- เห็น **เบสิค ID** เช่น `@845uybfn` (จด/copy เก็บไว้)
+- Channel ใน Developers Console ก็ถูกสร้างพร้อมกัน
+
+> 💡 **Basic ID (`@xxxx`)** = ID ที่คนใช้ Add Friend  
+> **Your user ID (`Uxxxxx`)** = ID สำหรับใช้ใน push API (จะหาใน 6.4)
+
+### 6.3 กลับไป Developers Console + รับ Channel Access Token (2 นาที)
+
+1. เปิด tab ใหม่ ไปที่ **https://developers.line.biz/console/**
+2. คลิกที่ Provider `KU Workshop` (ที่สร้างไว้)
+3. จะเห็น **Channel ใหม่** ชื่อ `KU-W1-[ชื่อ]` ที่สร้างอัตโนมัติ
+4. คลิกเข้าไปใน Channel
+5. เลือก tab **Messaging API**
+6. เลื่อนลงหา section **Channel access token (long-lived)**
+7. กด **Issue** → token จะแสดง
+8. **Copy เก็บไว้** (ยาว ~170 ตัวอักษร)
+
+> ⚠️ **Token = รหัสผ่าน!** อย่า commit ขึ้น Git / share ในที่สาธารณะ  
 > ถ้าหลุด → กด **Reissue** ทันที
+
+> 💡 **ถ้าไม่เห็น Channel ใน Provider:** Refresh หน้า หรือ logout/login ใหม่
 
 ### 6.4 เพิ่ม Bot เป็นเพื่อน + หา User ID (3 นาที)
 

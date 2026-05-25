@@ -103,6 +103,32 @@ const payload = {
 
 ---
 
+## ❌ กด "Create Messaging API channel" แล้ว redirect ไปหน้าภาษาไทย
+
+**อาการ:** คลิก Create a Messaging API channel ใน Developers Console แล้วถูก redirect ไปหน้าสร้าง "LINE ออฟฟิเชียลแอคเคาท์" (ภาษาไทย) ไม่ใช่ form ตามที่สไลด์เก่าเขียน
+
+**สาเหตุ:** ไม่ใช่ bug — LINE รวม flow สร้าง Channel + OA เข้าด้วยกัน (ตั้งแต่ปลาย 2024)
+
+**วิธีทำ:**
+1. กรอกฟอร์มภาษาไทย 5 ช่อง (ขั้นที่ 1/3)
+2. ตรวจสอบรายละเอียด (ขั้นที่ 2/3) → กด **เสร็จสิ้น**
+3. ได้ **เบสิค ID** เช่น `@845uybfn` (3/3)
+4. กลับไป `developers.line.biz/console` → Channel ใหม่จะปรากฏใน Provider
+
+---
+
+## ❌ ไม่เห็น Channel ใหม่ใน Developers Console
+
+**อาการ:** สร้าง OA เสร็จแล้ว แต่กลับไป Developers Console ไม่เห็น channel
+
+**วิธีแก้:**
+1. Refresh หน้า (Ctrl+F5)
+2. ดูใน Provider ที่ถูกต้อง (ที่คุณสร้างไว้)
+3. ลอง logout → login ใหม่
+4. ถ้ายังไม่เห็น → ดูที่ "All channels" จาก Console home
+
+---
+
 ## ❌ LINE Messaging API: Error 401 Unauthorized
 
 **อาการ:** HTTP Request node ขึ้นแดง — error `401`
