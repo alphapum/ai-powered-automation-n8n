@@ -12,10 +12,94 @@
 
 1. **URL ผิด** — เช็คว่าใน Apps Script ใส่ Test URL ถูก (ขึ้นต้นด้วย `webhook-test`)
 2. **Apps Script ยังไม่ trigger** — เช็คที่ Triggers ของ Apps Script ว่ามี trigger `onFormSubmit` แสดงสีเขียวอยู่
-3. **Submit form แล้วแต่ trigger ไม่ทำงาน** — ลอง:
-   - ที่ Apps Script editor กด **Run** บน function `onFormSubmit` ครั้งหนึ่งเพื่อทดสอบ permission
-   - อาจมี popup ขอ permission อีกครั้ง — Allow
-4. **n8n หมดเวลารอ** — Listen for test event มีเวลา 120 วินาที — ลองกดใหม่อีกครั้ง
+3. **Event type ผิด** — ต้องเป็น `เมื่อส่งฟอร์ม` (On form submit) ไม่ใช่ `เมื่อเปิด` (On open)!
+4. **Submit form แล้วแต่ trigger ไม่ทำงาน** — เปิด `⌛ Executions` ใน Apps Script ดู:
+   - ถ้าไม่มี execution → trigger ไม่ทำงาน
+   - ถ้ามี execution สีแดง (Failed) → คลิกดู error
+5. **n8n หมดเวลารอ** — Listen for test event มีเวลา 120 วินาที — ลองกดใหม่อีกครั้ง
+
+---
+
+## ❌ Webhook ได้ข้อมูลแต่ค่าเป็น `empty`
+
+**อาการ:** n8n รับ webhook ได้ แต่ใน body เห็น `name: empty`, `student_id: empty`, ฯลฯ — แม้ใน `_debug_raw` มีค่าครบ
+
+**สาเหตุ:** ชื่อคำถามใน Form ใช้ตัว dash unicode ต่างจาก code
+
+ตัวอย่าง: `-` ใน Form อาจเป็น U+2013 (en dash) หรือ U+2014 (em dash) — ดูตาเปล่าเหมือน hyphen U+002D ที่อยู่ในโค้ด แต่ความจริงต่างกัน
+
+**วิธีแก้:** ใช้ `findField()` partial match แทน exact key
+
+```javascript
+function findField(keyword) {
+  const key = Object.keys(responses).find(k => k.includes(keyword));
+  return key ? responses[key] : "";
+}
+
+const payload = {
+  name:       findField("ชื่อ"),       // match "ชื่อ-นามสกุล"
+  student_id: findField("รหัส"),
+  topic:      findField("เรื่อง"),
+  detail:     findField("รายละเอียด")
+};
+```
+
+ดูตัวอย่างเต็มใน [`apps-script.gs`](apps-script.gs) บน GitHub
+
+---
+
+## ❌ Set node: Output ขึ้น `[Execute previous nodes for preview]`
+
+**อาการ:** เปิด Set node แล้วใน Result preview เห็น `[Execute previous nodes for preview]` ทั้งหมด
+
+**สาเหตุ:** n8n หมด test data — ต้อง trigger Webhook ใหม่ก่อน
+
+**วิธีแก้:**
+1. ปิด Expression editor
+2. คลิก Webhook node → กด `Listen for test event` ใหม่
+3. Submit form อีกครั้ง
+4. กลับมา Set node — preview จะแสดงค่าจริง
+
+---
+
+## ❌ Set node: ข้อความใน LINE ขึ้นต้นด้วย `=`
+
+**อาการ:** ใน LINE เห็นข้อความ `=📩 คำร้องใหม่จาก:...`
+
+**สาเหตุ:** พิมพ์ `=` หน้า `📩` ใน expression — ตัว `=` กลายเป็นตัวอักษรในข้อความ
+
+**วิธีแก้:** ลบ `=` ตัวแรกออก (ที่อยู่หน้า 📩)
+- ตัว `=` เล็กๆ ในป้ายซ้ายของ input box คือ expression mode indicator — n8n ใส่ให้เอง
+- **อย่าพิมพ์ซ้ำ** ในเนื้อ value
+
+---
+
+## ❌ Set node: ค่าเป็น `empty` ทั้งที่ Webhook มีข้อมูล
+
+**อาการ:** Webhook node เห็นค่าครบ แต่ Set node output เป็น `empty` ทั้งหมด
+
+**สาเหตุ:** ใช้ `{{ $json.name }}` ที่ root level — แต่ Webhook ใส่ payload ใน `body`
+
+**วิธีแก้:** เปลี่ยนเป็น `{{ $json.body.name }}` (เพิ่ม `.body.`)
+
+```
+✗ ผิด: {{ $json.name }}
+✓ ถูก: {{ $json.body.name }}
+```
+
+**ทางลัด:** ลาก field จาก INPUT panel (ซ้าย) → วางใน Value box → n8n เติม path ถูกให้อัตโนมัติ
+
+---
+
+## ❌ Set node: `\n` แสดงเป็นตัวอักษร ไม่ขึ้นบรรทัดใหม่
+
+**อาการ:** Table view ของ output เห็น `\nรหัส:` แทนที่จะขึ้นบรรทัดใหม่
+
+**สาเหตุ:** ไม่ใช่ปัญหา — n8n Table view แสดง newline เป็น `\n` เพื่อให้อ่าน 1 บรรทัด
+
+**ตรวจสอบ:** คลิก **JSON** button มุมขวาบนของ Output panel — จะเห็น `"message": "...\nรหัส..."` ซึ่งคือ newline จริง
+
+ตอนส่ง LINE จะแสดงเป็น**หลายบรรทัด**ปกติ
 
 ---
 

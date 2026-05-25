@@ -23,7 +23,7 @@
             {
               "name": "message",
               "type": "stringValue",
-              "stringValue": "=📩 คำร้องใหม่จาก: {{ $json.name }}\nรหัส: {{ $json.student_id }}\nเรื่อง: {{ $json.topic }}\n\nรายละเอียด:\n{{ $json.detail }}"
+              "stringValue": "=📩 คำร้องใหม่จาก: {{ $json.body.name }}\nรหัส: {{ $json.body.student_id }}\nเรื่อง: {{ $json.body.topic }}\n\nรายละเอียด:\n{{ $json.body.detail }}"
             }
           ]
         },

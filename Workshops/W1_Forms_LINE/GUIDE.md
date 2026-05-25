@@ -182,15 +182,21 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
    - **Value:** ใส่ข้อความนี้ (ใช้ expression):
 
 ```
-📩 คำร้องใหม่จาก: {{ $json.name }}
-รหัส: {{ $json.student_id }}
-เรื่อง: {{ $json.topic }}
+📩 คำร้องใหม่จาก: {{ $json.body.name }}
+รหัส: {{ $json.body.student_id }}
+เรื่อง: {{ $json.body.topic }}
 
 รายละเอียด:
-{{ $json.detail }}
+{{ $json.body.detail }}
 ```
 
-> 💡 **Expression `{{ $json.xxx }}`** = ดึงค่าจาก JSON ของ node ก่อนหน้า
+> 💡 **Expression `{{ $json.body.xxx }}`** = ดึงค่าจาก JSON body ของ Webhook
+>
+> ⚠️ **ต้องมี `.body.`** เพราะ Webhook ใส่ payload ใน `body` ไม่ใช่ root
+>
+> ⚠️ **อย่าพิมพ์ `=` หน้า 📩** — n8n ใส่เครื่องหมาย `=` ให้เองในป้ายซ้าย (expression mode indicator) ถ้าพิมพ์ซ้ำ จะติดไปกับข้อความตอนส่ง LINE
+>
+> 💡 **`\n` ใน Table view = newline จริง** — ตอนส่ง LINE จะเป็นบรรทัดใหม่ปกติ คลิก JSON button เพื่อดูโครงสร้างจริง
 
 4. กด **Execute step** (มุมขวาบน) → ดู output ของ Set node
 5. ควรเห็น field `message` มีข้อความครบ:
