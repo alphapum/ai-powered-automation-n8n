@@ -117,6 +117,39 @@ const payload = {
 
 ---
 
+## ❓ Webhook URL ต้องใส่อะไร?
+
+**คำถาม:** ในหน้า Messaging API ของ Channel เห็น section "Webhook settings → Webhook URL" — ต้องใส่อะไรมั้ย?
+
+**คำตอบ:** **ไม่ต้องใส่!** ปล่อยว่างได้
+
+**สาเหตุ:** Webhook URL เป็นที่อยู่ของเราที่ **LINE จะ POST event มาให้** (ขาเข้า) เช่น user พิมพ์ข้อความถึง Bot — LINE จะส่ง event มาที่ Webhook URL
+
+Workshop 1 ของเราใช้ **Push API ทางเดียว** — n8n → LINE (ส่งแจ้งเตือนออก) — ไม่ต้องรับข้อความจาก user
+
+| ทิศทาง | ใช้อะไร | Workshop ไหน |
+|---|---|---|
+| n8n → LINE (ส่งออก) | Push API + Channel Access Token | **Workshop 1** ✅ |
+| LINE → n8n (รับเข้า) | Webhook URL | Workshop ขั้นสูง (Bot ตอบกลับ) |
+
+---
+
+## ❌ กดปุ่มผิด: ขอรับรองบัญชี (Verified Account)
+
+**อาการ:** หน้า 3/3 หลังสร้าง OA เสร็จ เผลอกดปุ่มสีเขียวเข้ม **"ขอรับรองบัญชี"** → ถูกพาไปฟอร์มสมัคร Verified Account (ต้องส่งเอกสาร, paid, รอ approve)
+
+**สาเหตุ:** ปุ่มสีเขียวเข้มในหน้านี้ = **สมัคร Verified Account** ซึ่งเป็น paid feature สำหรับธุรกิจที่ต้องการความน่าเชื่อถือ (มีป้ายรับรองสีฟ้า) — Workshop **ไม่ต้องใช้**
+
+**วิธีแก้:**
+1. กด **Back** ที่ browser
+2. หรือปิด tab แล้วไปที่ `developers.line.biz/console` ตรงๆ
+3. หรือไปที่ `manager.line.biz` (LINE OA Manager) → จะเห็น OA ใหม่อยู่
+4. ดำเนินการต่อ Step 6.3
+
+**ในอนาคต:** ถ้าเจอหน้า 3/3 → กด **ปุ่มขอบเขียวข้างในขาว** "ภายหลัง (ไปหน้าจอ Manager)" แทน
+
+---
+
 ## ❌ ไม่เห็น Channel ใหม่ใน Developers Console
 
 **อาการ:** สร้าง OA เสร็จแล้ว แต่กลับไป Developers Console ไม่เห็น channel
