@@ -257,17 +257,67 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 **D. ขั้นที่ 3/3 — สำเร็จ!**
 - เห็นข้อความ "สร้าง LINE ออฟฟิเชียลแอคเคาท์แล้ว"
-- เห็น **เบสิค ID** เช่น `@845uybfn` (จด/copy เก็บไว้)
+- เห็น **เบสิค ID** เช่น `@673zrhdy` (จด/copy เก็บไว้)
 - Channel ใน Developers Console ก็ถูกสร้างพร้อมกัน
+
+**E. ⚠️ สำคัญ — เลื่อนล่างจะมี 2 ปุ่ม:**
+
+| ปุ่ม | สี | ทำอะไร | ใช้มั้ย? |
+|------|-----|--------|----------|
+| **ขอรับรองบัญชี** | สีเขียวเข้ม | สมัครบัญชี Verified (paid feature + ต้องรอ approve) | ❌ **อย่ากด!** |
+| **ภายหลัง (ไปหน้าจอ Manager)** | ขอบเขียวข้างในขาว | ข้ามขั้นรับรอง → เข้า LINE OA Manager | ✅ **กดอันนี้** |
 
 > 💡 **Basic ID (`@xxxx`)** = ID ที่คนใช้ Add Friend  
 > **Your user ID (`Uxxxxx`)** = ID สำหรับใช้ใน push API (จะหาใน 6.4)
+>
+> 🚨 **ปุ่มสีเขียวเข้ม "ขอรับรองบัญชี" = เสียเงิน + ต้องส่งเอกสาร**  
+> สำหรับ Workshop ไม่ต้องใช้ — กด "ภายหลัง" ผ่านไปได้เลย
 
-### 6.3 กลับไป Developers Console + รับ Channel Access Token (2 นาที)
+### 6.3 Enable Messaging API ใน OA Manager (2 นาที)
+
+หลังกด "ภายหลัง (ไปหน้าจอ Manager)" จากขั้น 6.2 — เข้า LINE OA Manager (`manager.line.biz`)
+
+**A. เข้า Messaging API page:**
+1. **ถ้ามีหน้า "ข้อตกลงเกี่ยวกับการใช้ข้อมูล"** → กด **ยอมรับ**
+2. ที่หน้า LINE OA Manager Home (`manager.line.biz/account/@xxxx`)
+3. คลิก **Settings** (ฟันเฟือง มุมขวาบน)
+4. เมนูซ้าย → คลิก **Messaging API**
+5. จะเห็น **Status: Disabled** + ปุ่มเขียว **Enable Messaging API**
+6. กดปุ่ม **Enable Messaging API**
+
+**B. Dialog 1 — Select provider:**
+- เลือก radio button **`KU Workshop`** (Provider ที่สร้างไว้)
+- มีข้อความ "By tapping Agree below, you agree to the Messaging API Terms..."
+- กด **Agree** (สีเขียว)
+
+**C. Dialog 2 — Privacy Policy and Terms of Use (optional):**
+- มี 2 ช่องให้กรอก URL → **เว้นว่างทั้ง 2 ช่อง** (optional)
+- กด **OK** (สีเขียว)
+
+**D. Dialog 3 — Enabling Messaging API:**
+- แสดง warning: *"You won't be able to change or unlink this provider once linked"*
+- ยืนยันข้อมูล: Account name = `KU-W1-Kong`, Provider name = `KU Workshop`
+- กด **OK** (สีเขียว)
+
+**E. ผลลัพธ์:**
+- Status เปลี่ยนเป็น **Enabled** ✅
+- เห็น **Channel info**:
+  - Channel ID (ตัวเลข ~10 หลัก)
+  - Channel secret (32 ตัว hex)
+- ช่อง **Webhook URL** (ยังว่าง — ไม่ต้องใส่)
+- ข้อความ "You can find more related settings in the LINE Developers Console"
+
+> ⚠️ **ขั้นนี้สำคัญ!** ถ้าไม่ Enable — แม้มี Channel + Token ก็จะส่งข้อความไม่ได้
+> 
+> 💡 **ทำไมต้อง Enable?** OA ถูกสร้างพร้อม Channel แต่ default = Disabled เพื่อให้เจ้าของเลือกว่าจะใช้ API หรือใช้เป็น OA แชทธรรมดา
+>
+> 🔒 **Channel secret ที่เห็น** = ไว้ใช้ verify webhook signature (เราไม่ต้องใช้ใน workshop นี้)
+
+### 6.4 กลับไป Developers Console + รับ Channel Access Token (2 นาที)
 
 1. เปิด tab ใหม่ ไปที่ **https://developers.line.biz/console/**
 2. คลิกที่ Provider `KU Workshop` (ที่สร้างไว้)
-3. จะเห็น **Channel ใหม่** ชื่อ `KU-W1-[ชื่อ]` ที่สร้างอัตโนมัติ
+3. จะเห็น **Channel** ชื่อ `KU-W1-[ชื่อ]` (ที่เพิ่ง enable แล้ว)
 4. คลิกเข้าไปใน Channel
 5. เลือก tab **Messaging API**
 6. เลื่อนลงหา section **Channel access token (long-lived)**
@@ -279,7 +329,7 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 > 💡 **ถ้าไม่เห็น Channel ใน Provider:** Refresh หน้า หรือ logout/login ใหม่
 
-### 6.4 เพิ่ม Bot เป็นเพื่อน + หา User ID (3 นาที)
+### 6.5 เพิ่ม Bot เป็นเพื่อน + หา User ID (3 นาที)
 
 **A. เพิ่ม Bot:**
 1. ใน tab Messaging API เลื่อนหา **QR code**
@@ -295,7 +345,7 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 > - **Your user ID** (ขึ้นต้น `U`) ← ใช้อันนี้!
 > - **Bot user ID** (ขึ้นต้น `@`) ← ไม่ใช่อันนี้
 
-### 6.5 เพิ่ม HTTP Request Node ใน n8n (5 นาที)
+### 6.6 เพิ่ม HTTP Request Node ใน n8n (5 นาที)
 
 1. ที่ Set node กดปุ่ม **`+`**
 2. ค้นหา **`HTTP Request`** → คลิก
