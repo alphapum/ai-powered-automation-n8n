@@ -162,6 +162,33 @@ Workshop 1 ของเราใช้ **Push API ทางเดียว** —
 
 ---
 
+## ❌ JSON parameter needs to be valid JSON
+
+**อาการ:** กด Execute step → error:
+```
+JSON parameter needs to be valid JSON
+```
+
+**สาเหตุ:** เขียน `"text": "{{ $json.message }}"` (มี `"` ครอบ) — แต่ข้อความจาก Set node มี **newline จริง** (ขึ้นบรรทัด) ทำให้ JSON parse fail (JSON spec ไม่อนุญาตให้มี raw newline ใน string)
+
+**วิธีแก้:** ใช้ `JSON.stringify()` ครอบ + **ลบ `"` รอบ `{{ }}` ออก**
+
+❌ **ผิด:**
+```json
+"text": "{{ $json.message }}"
+```
+
+✅ **ถูก:**
+```json
+"text": {{ JSON.stringify($json.message) }}
+```
+
+> 💡 `JSON.stringify()` ใส่ `"` ครอบ + escape newline เป็น `\n` ให้อัตโนมัติ
+>
+> ถ้ายังใส่ `"` รอบ → กลายเป็น double-quoted (`""..."`)  → JSON ผิด format
+
+---
+
 ## ❌ Invalid URL: must start with "http" or "https"
 
 **อาการ:** กด Execute step ใน HTTP Request → error:

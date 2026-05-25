@@ -384,12 +384,20 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
   "messages": [
     {
       "type": "text",
-      "text": "{{ $json.message }}"
+      "text": {{ JSON.stringify($json.message) }}
     }
   ]
 }
      ```
    - **แทน `U1a2b3...` ด้วย Your user ID ของคุณ** (จาก Step 6.4)
+
+> ⚠️ **สังเกต `"text"` ไม่มี `"` ครอบ!**
+> 
+> ใช้ `{{ JSON.stringify($json.message) }}` แทน `"{{ $json.message }}"`
+> 
+> เพราะ `JSON.stringify()` ใส่ `"` ครอบ + escape `\n` ให้อัตโนมัติ
+> 
+> ถ้าใส่ `"` รอบอีกชั้น → JSON parse fail เพราะข้อความมี newline จริง
 
 ✅ **เช็ค:** ตั้งค่าครบทุกช่อง + ใส่ user ID ของตัวเองแล้ว
 

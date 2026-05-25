@@ -44,7 +44,7 @@
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
-        "jsonBody": "={\n  \"to\": \"REPLACE_WITH_YOUR_LINE_USER_ID\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.message }}\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"to\": \"REPLACE_WITH_YOUR_LINE_USER_ID\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": {{ JSON.stringify($json.message) }}\n    }\n  ]\n}",
         "options": {}
       },
       "id": "n03-http-line",
