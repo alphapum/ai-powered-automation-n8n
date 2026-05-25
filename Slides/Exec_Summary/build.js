@@ -413,294 +413,234 @@ function thaiText(text, opts) {
 }
 
 // ============================================================
-// SLIDE 4 — AI Agent Architecture (Single Agent)
+// SLIDE 4 — AI Agent Architecture (Single Agent) — KU mapped
 // ============================================================
 {
   const s = pres.addSlide();
-  s.background = { color: COLORS.white };
+  s.background = { color: COLORS.bgWarm };
 
   // Header
-  s.addText("สถาปัตยกรรม AI Agent", {
+  s.addText("สถาปัตยกรรม AI Agent  —  Mapped กับโครงสร้าง มก.", {
     x: 0.5, y: 0.3, w: 9, h: 0.55,
-    fontFace: FONT_THAI, fontSize: 32, bold: true,
+    fontFace: FONT_THAI, fontSize: 28, bold: true,
     color: COLORS.KUgreen, margin: 0,
   });
-  s.addText("User สั่งงาน → Agent ใช้ Tools/Database + LLM → ทำ Action → Feedback Loop", {
+  s.addText("6 องค์ประกอบหลัก  •  ทุกตัวแมพกับโครงสร้างที่ มก. มีอยู่แล้ว (apigw.ku.ac.th + workflow.ku.ac.th)", {
     x: 0.5, y: 0.85, w: 9, h: 0.3,
     fontFace: FONT_THAI, fontSize: 13, italic: true,
     color: COLORS.gray, margin: 0,
   });
 
-  // ===========================================================
-  // Diagram — Container box + components
-  // ===========================================================
-  const containerX = 1.5, containerY = 1.85;
-  const containerW = 7.0, containerH = 2.95;
-
-  // ---- USER (top, outside container) ----
-  const userX = 4.5, userY = 1.3;
-  s.addText("👥", {
-    x: userX - 0.35, y: userY - 0.1, w: 0.6, h: 0.5,
-    fontSize: 26, align: "center", valign: "middle", margin: 0,
-  });
-  s.addText("User", {
-    x: userX + 0.25, y: userY, w: 0.8, h: 0.35,
-    fontFace: FONT_THAI, fontSize: 14, bold: true,
-    color: COLORS.KUgreen, valign: "middle", margin: 0,
-  });
-
-  // Bidirectional arrows User <-> Agent
-  s.addShape(pres.shapes.LINE, {
-    x: userX - 0.1, y: userY + 0.5, w: 0, h: 0.3,
-    line: { color: COLORS.ink, width: 2, endArrowType: "triangle" },
-  });
-  s.addShape(pres.shapes.LINE, {
-    x: userX + 0.1, y: userY + 0.5, w: 0, h: 0.3,
-    line: { color: COLORS.ink, width: 2, beginArrowType: "triangle" },
-  });
-
-  // ---- Container box (thin border) ----
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: containerX, y: containerY, w: containerW, h: containerH,
-    fill: { color: COLORS.bgSoft },
-    line: { color: COLORS.ink, width: 1.5 },
-  });
-
-  // ---- AI Agent (chip) — straddles top of container ----
-  const agentX = userX - 0.4, agentY = 1.95, agentW = 0.8, agentH = 0.7;
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: agentX, y: agentY, w: agentW, h: agentH,
-    fill: { color: COLORS.white },
-    line: { color: COLORS.KUgreen, width: 2.5 },
-  });
-  // Chip inner pattern (circuit-like)
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: agentX + 0.1, y: agentY + 0.1, w: agentW - 0.2, h: agentH - 0.2,
-    fill: { color: COLORS.KUgreenSoft },
-    line: { color: COLORS.KUgreen, width: 0.5 },
-  });
-  // Pins (small lines on sides)
-  for (let i = 0; i < 3; i++) {
-    const py = agentY + 0.15 + i * 0.2;
-    s.addShape(pres.shapes.LINE, { x: agentX - 0.08, y: py, w: 0.08, h: 0, line: { color: COLORS.KUgreen, width: 1.5 } });
-    s.addShape(pres.shapes.LINE, { x: agentX + agentW, y: py, w: 0.08, h: 0, line: { color: COLORS.KUgreen, width: 1.5 } });
-  }
-  s.addText("AI", {
-    x: agentX, y: agentY + 0.05, w: agentW, h: 0.6,
-    fontFace: "Calibri", fontSize: 22, bold: true, italic: true,
-    color: COLORS.KUgreen, align: "center", valign: "middle", margin: 0,
-  });
-  s.addText("AI Agent", {
-    x: agentX - 1.4, y: agentY + 0.15, w: 1.3, h: 0.35,
-    fontFace: FONT_THAI, fontSize: 14, bold: true,
-    color: COLORS.ink, align: "right", valign: "middle", margin: 0,
-  });
-
-  // ---- DATABASE (left top, inside container) ----
-  const dbX = 1.8, dbY = 2.4;
-  const dbW = 0.85, dbH = 0.65;
-  // Cylinder approximation (oval top + rectangle + oval bottom)
-  s.addShape(pres.shapes.OVAL, {
-    x: dbX, y: dbY, w: dbW, h: 0.2,
-    fill: { color: COLORS.KUgold }, line: { color: COLORS.KUgold, width: 1 },
-  });
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: dbX, y: dbY + 0.1, w: dbW, h: dbH - 0.2,
-    fill: { color: COLORS.KUgold }, line: { type: "none" },
-  });
-  s.addShape(pres.shapes.OVAL, {
-    x: dbX, y: dbY + dbH - 0.2, w: dbW, h: 0.2,
-    fill: { color: COLORS.KUgoldSoft }, line: { color: COLORS.KUgold, width: 1 },
-  });
-  // Database "lines" pattern
-  s.addShape(pres.shapes.LINE, {
-    x: dbX + 0.1, y: dbY + 0.3, w: dbW - 0.2, h: 0, line: { color: COLORS.white, width: 0.5 },
-  });
-  s.addText("Database", {
-    x: dbX - 0.3, y: dbY + dbH + 0.05, w: dbW + 0.6, h: 0.3,
-    fontFace: FONT_THAI, fontSize: 12, bold: true,
-    color: COLORS.ink, align: "center", margin: 0,
-  });
-
-  // ---- VECTOR DATABASE (left bottom, inside container) ----
-  const vdbX = 1.8, vdbY = 3.75;
-  s.addShape(pres.shapes.OVAL, {
-    x: vdbX, y: vdbY, w: dbW, h: 0.2,
-    fill: { color: COLORS.KUgreenLight }, line: { color: COLORS.KUgreen, width: 1 },
-  });
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: vdbX, y: vdbY + 0.1, w: dbW, h: dbH - 0.2,
-    fill: { color: COLORS.KUgreenLight }, line: { type: "none" },
-  });
-  s.addShape(pres.shapes.OVAL, {
-    x: vdbX, y: vdbY + dbH - 0.2, w: dbW, h: 0.2,
-    fill: { color: COLORS.KUgreenSoft }, line: { color: COLORS.KUgreen, width: 1 },
-  });
-  // Dots pattern (vector representation)
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 2; j++) {
-      s.addShape(pres.shapes.OVAL, {
-        x: vdbX + 0.15 + i * 0.13, y: vdbY + 0.28 + j * 0.12, w: 0.04, h: 0.04,
-        fill: { color: COLORS.white }, line: { type: "none" },
+  // Helper: Component card with title + KU mapping pill
+  function compCard(x, y, w, h, opts) {
+    s.addShape(pres.shapes.RECTANGLE, {
+      x, y, w, h,
+      fill: { color: COLORS.white },
+      line: { color: opts.color, width: 1.8 },
+      shadow: { type: "outer", color: "000000", blur: 6, offset: 1, angle: 90, opacity: 0.08 },
+    });
+    s.addShape(pres.shapes.RECTANGLE, {
+      x, y, w, h: 0.08,
+      fill: { color: opts.color }, line: { type: "none" },
+    });
+    if (opts.icon) {
+      s.addText(opts.icon, {
+        x: x + 0.05, y: y + 0.12, w: 0.45, h: 0.45,
+        fontSize: 20, align: "center", valign: "middle", margin: 0,
+      });
+    }
+    s.addText(opts.titleTh, {
+      x: x + 0.55, y: y + 0.13, w: w - 0.6, h: 0.3,
+      fontFace: FONT_THAI, fontSize: 13, bold: true,
+      color: COLORS.ink, margin: 0,
+    });
+    s.addText("(" + opts.titleEn + ")", {
+      x: x + 0.55, y: y + 0.36, w: w - 0.6, h: 0.22,
+      fontFace: "Calibri", fontSize: 10, italic: true,
+      color: COLORS.gray, margin: 0,
+    });
+    if (opts.detail) {
+      s.addText(opts.detail, {
+        x: x + 0.1, y: y + 0.62, w: w - 0.2, h: h - 0.95,
+        fontFace: FONT_THAI, fontSize: 10,
+        color: COLORS.inkSoft, margin: 0,
+      });
+    }
+    if (opts.kuMap) {
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: x + 0.1, y: y + h - 0.3, w: w - 0.2, h: 0.24,
+        fill: { color: COLORS.KUgreenSoft },
+        line: { color: COLORS.KUgreen, width: 0.5 },
+      });
+      s.addText(opts.kuMap, {
+        x: x + 0.1, y: y + h - 0.3, w: w - 0.2, h: 0.24,
+        fontFace: "Calibri", fontSize: 9, bold: true,
+        color: COLORS.KUgreen, align: "center", valign: "middle", margin: 0,
       });
     }
   }
-  s.addText("Vector\nDatabase", {
-    x: vdbX - 0.4, y: vdbY + dbH + 0.05, w: dbW + 0.8, h: 0.45,
-    fontFace: FONT_THAI, fontSize: 12, bold: true,
-    color: COLORS.ink, align: "center", margin: 0,
-  });
 
-  // ---- LLM (center) ----
-  const llmX = 4.45, llmY = 3.2;
-  const boxW = 0.9, boxH = 0.85;
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: llmX, y: llmY, w: boxW, h: boxH,
-    fill: { color: COLORS.white },
-    line: { color: COLORS.KUgreen, width: 2 },
-  });
-  // Inner neural network icon (simple node graph)
-  s.addText("🧠", {
-    x: llmX, y: llmY, w: boxW, h: boxH,
-    fontSize: 32, align: "center", valign: "middle", margin: 0,
-  });
-  s.addText("LLM", {
-    x: llmX - 0.5, y: llmY + boxH + 0.05, w: boxW + 1.0, h: 0.3,
-    fontFace: FONT_THAI, fontSize: 13, bold: true,
-    color: COLORS.ink, align: "center", margin: 0,
-  });
-
-  // ---- ACTION (right) ----
-  const actX = 6.7, actY = 3.2;
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: actX, y: actY, w: boxW, h: boxH,
-    fill: { color: COLORS.white },
-    line: { color: COLORS.red, width: 2 },
-  });
-  s.addText("⚙️", {
-    x: actX, y: actY, w: boxW, h: boxH,
-    fontSize: 32, align: "center", valign: "middle", margin: 0,
-  });
-  s.addText("Action", {
-    x: actX - 0.5, y: actY + boxH + 0.05, w: boxW + 1.0, h: 0.3,
-    fontFace: FONT_THAI, fontSize: 13, bold: true,
-    color: COLORS.ink, align: "center", margin: 0,
-  });
-
-  // ===========================================================
-  // Arrows inside container
-  // ===========================================================
-  // Agent -> Database (bidirectional)
-  s.addShape(pres.shapes.LINE, {
-    x: dbX + dbW + 0.05, y: dbY + 0.25, w: agentX - (dbX + dbW + 0.05) - 0.05, h: agentY + 0.4 - (dbY + 0.25),
-    line: { color: COLORS.ink, width: 1.5, endArrowType: "triangle" },
-  });
-  s.addShape(pres.shapes.LINE, {
-    x: dbX + dbW + 0.05, y: dbY + 0.45, w: agentX - (dbX + dbW + 0.05) - 0.05, h: agentY + 0.55 - (dbY + 0.45),
-    line: { color: COLORS.ink, width: 1.5, beginArrowType: "triangle" },
-  });
-
-  // Agent -> Vector DB (bidirectional)
-  s.addShape(pres.shapes.LINE, {
-    x: vdbX + dbW + 0.05, y: vdbY + 0.25, w: agentX - (vdbX + dbW + 0.05) - 0.05, h: agentY + 0.4 - (vdbY + 0.25),
-    line: { color: COLORS.ink, width: 1.5, endArrowType: "triangle" }, flipV: true,
-  });
-  s.addShape(pres.shapes.LINE, {
-    x: vdbX + dbW + 0.05, y: vdbY + 0.45, w: agentX - (vdbX + dbW + 0.05) - 0.05, h: agentY + 0.6 - (vdbY + 0.45),
-    line: { color: COLORS.ink, width: 1.5, beginArrowType: "triangle" }, flipV: true,
-  });
-
-  // Agent -> LLM (down)
-  s.addShape(pres.shapes.LINE, {
-    x: agentX + agentW / 2, y: agentY + agentH + 0.05, w: 0, h: llmY - (agentY + agentH) - 0.1,
-    line: { color: COLORS.ink, width: 2, endArrowType: "triangle" },
-  });
-
-  // LLM -> Action (right)
-  s.addShape(pres.shapes.LINE, {
-    x: llmX + boxW + 0.05, y: llmY + boxH / 2, w: actX - (llmX + boxW) - 0.1, h: 0,
-    line: { color: COLORS.ink, width: 2, endArrowType: "triangle" },
-  });
-
-  // ===========================================================
-  // Feedback Loop (bottom, straddling container)
-  // ===========================================================
-  const fbX = 4.45, fbY = 4.55;
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: fbX, y: fbY, w: boxW, h: 0.5,
-    fill: { color: COLORS.white },
-    line: { color: COLORS.KUgreen, width: 2 },
-  });
-  s.addText("🔄", {
-    x: fbX, y: fbY, w: boxW, h: 0.5,
-    fontSize: 22, align: "center", valign: "middle", margin: 0,
-  });
-  s.addText("Feedback Loop", {
-    x: fbX + boxW + 0.1, y: fbY + 0.1, w: 1.6, h: 0.3,
-    fontFace: FONT_THAI, fontSize: 12, bold: true,
-    color: COLORS.ink, valign: "middle", margin: 0,
-  });
-
-  // Circular feedback arrows below
-  s.addText("↻", {
-    x: fbX - 0.4, y: fbY + 0.55, w: 0.5, h: 0.3,
-    fontSize: 16, color: COLORS.grayLight, align: "center", margin: 0,
-  });
-  s.addText("↺", {
-    x: fbX + boxW - 0.1, y: fbY + 0.55, w: 0.5, h: 0.3,
-    fontSize: 16, color: COLORS.grayLight, align: "center", margin: 0,
-  });
-
-  // Right side: KU example callout
-  const rX = 8.7, rY = 1.95;
-  s.addShape(pres.shapes.RECTANGLE, {
-    x: rX, y: rY, w: 1.2, h: 2.85,
+  // CENTER: Brain (สมอง)
+  const brainX = 4.55, brainY = 2.85, brainW = 1.1, brainH = 1.1;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    x: brainX, y: brainY, w: brainW, h: brainH,
     fill: { color: COLORS.KUgreenSoft },
-    line: { color: COLORS.KUgreen, width: 0.5 },
+    line: { color: COLORS.KUgreen, width: 2 },
+    rectRadius: 0.12,
+    shadow: { type: "outer", color: "000000", blur: 10, offset: 2, angle: 90, opacity: 0.15 },
   });
-  s.addText("ตัวอย่าง\nใน มก.", {
-    x: rX, y: rY + 0.1, w: 1.2, h: 0.55,
-    fontFace: FONT_THAI, fontSize: 11, bold: true,
+  s.addText("🧠", {
+    x: brainX, y: brainY + 0.05, w: brainW, h: 0.65,
+    fontSize: 38, align: "center", valign: "middle", margin: 0,
+  });
+  s.addText("สมอง", {
+    x: brainX, y: brainY + 0.7, w: brainW, h: 0.3,
+    fontFace: FONT_THAI, fontSize: 13, bold: true,
     color: COLORS.KUgreen, align: "center", margin: 0,
   });
 
-  // KU mapping
-  const kuMaps = [
-    { label: "User", value: "นิสิต/อาจารย์" },
-    { label: "LLM", value: "KU LLM" },
-    { label: "DB", value: "ทะเบียน" },
-    { label: "Vector", value: "BGE-M3" },
-    { label: "Action", value: "ตอบ / Email" },
+  // TOP: Prompt
+  compCard(3.7, 1.25, 2.8, 0.55, {
+    icon: "💼",
+    titleTh: "คำสั่งเริ่มต้น",
+    titleEn: "Prompt",
+    color: COLORS.KUgold,
+  });
+
+  // LLM/แกนหลัก
+  compCard(3.7, 2.0, 2.8, 0.65, {
+    icon: "🤖",
+    titleTh: "แกนหลักของเอเจนต์",
+    titleEn: "LLM / สมอง",
+    color: COLORS.KUgreenDark,
+    kuMap: "apigw.ku.ac.th  •  KU LLM (Mistral-7B)",
+  });
+
+  // Arrow: Prompt → LLM
+  s.addShape(pres.shapes.LINE, {
+    x: 5.1, y: 1.82, w: 0, h: 0.16,
+    line: { color: COLORS.ink, width: 2, endArrowType: "triangle" },
+  });
+  // Arrow: LLM → Brain
+  s.addShape(pres.shapes.LINE, {
+    x: 5.1, y: 2.67, w: 0, h: 0.16,
+    line: { color: COLORS.ink, width: 2, endArrowType: "triangle" },
+  });
+
+  // LEFT: Memory
+  compCard(0.5, 2.3, 2.8, 1.35, {
+    icon: "💭",
+    titleTh: "โมดูลความจำ",
+    titleEn: "Memory",
+    color: COLORS.KUgreenLight,
+    detail: "💬 ระยะสั้น (chat history)\n🗄 ระยะยาว (database)",
+    kuMap: "Vector DB  •  BGE-M3 embeddings",
+  });
+
+  // Arrow: Memory ↔ Brain
+  s.addShape(pres.shapes.LINE, {
+    x: 3.35, y: 3.25, w: 1.15, h: 0,
+    line: { color: COLORS.ink, width: 1.8, endArrowType: "triangle" },
+  });
+  s.addShape(pres.shapes.LINE, {
+    x: 3.35, y: 3.45, w: 1.15, h: 0,
+    line: { color: COLORS.ink, width: 1.8, beginArrowType: "triangle" },
+  });
+
+  // RIGHT: Planning
+  compCard(6.85, 2.3, 2.8, 1.35, {
+    icon: "🗺",
+    titleTh: "โมดูลการวางแผน",
+    titleEn: "Planning",
+    color: COLORS.KUgold,
+    detail: "Workflow steps: ① → ② → ③ → ④\nbreakdown task → execute",
+    kuMap: "workflow.ku.ac.th  •  n8n",
+  });
+
+  // Arrow: Brain → Planning
+  s.addShape(pres.shapes.LINE, {
+    x: 5.7, y: 3.25, w: 1.13, h: 0,
+    line: { color: COLORS.ink, width: 1.8, endArrowType: "triangle" },
+  });
+  s.addShape(pres.shapes.LINE, {
+    x: 5.7, y: 3.45, w: 1.13, h: 0,
+    line: { color: COLORS.ink, width: 1.8, beginArrowType: "triangle" },
+  });
+
+  // BOTTOM LEFT: Knowledge
+  compCard(0.5, 3.85, 2.8, 1.05, {
+    icon: "📚",
+    titleTh: "องค์ความรู้",
+    titleEn: "Knowledge",
+    color: COLORS.KUgreen,
+    detail: "course materials, KU databases,\nresearch papers, manuals",
+    kuMap: "ku.ac.th data sources",
+  });
+
+  // Arrow: Knowledge → Brain
+  s.addShape(pres.shapes.LINE, {
+    x: 3.35, y: 4.05, w: 1.2, h: -0.45,
+    line: { color: COLORS.ink, width: 1.5, endArrowType: "triangle" },
+  });
+
+  // BOTTOM RIGHT: Tools
+  compCard(4.0, 4.05, 2.6, 0.85, {
+    icon: "🛠",
+    titleTh: "เครื่องมือ",
+    titleEn: "Tools",
+    color: COLORS.red,
+    kuMap: "Google APIs + KU systems",
+  });
+
+  // Arrow: Brain → Tools
+  s.addShape(pres.shapes.LINE, {
+    x: 5.1, y: 3.97, w: 0, h: 0.07,
+    line: { color: COLORS.ink, width: 1.5, endArrowType: "triangle" },
+  });
+
+  // API outputs
+  const apis = [
+    { icon: "🔍", label: "ค้นหาข้อมูล" },
+    { icon: "🧮", label: "คำนวณ" },
+    { icon: "🗄", label: "ฐานข้อมูล" },
   ];
-  kuMaps.forEach((k, i) => {
-    const y = rY + 0.7 + i * 0.4;
-    s.addText(k.label, {
-      x: rX + 0.05, y, w: 1.1, h: 0.2,
-      fontFace: "Calibri", fontSize: 8, bold: true, charSpacing: 1,
-      color: COLORS.KUgreen, align: "center", margin: 0,
+  apis.forEach((a, i) => {
+    const ax = 6.85, ay = 4.05 + i * 0.28;
+    s.addShape(pres.shapes.LINE, {
+      x: 6.65, y: 4.47, w: 0.25, h: ay + 0.1 - 4.47,
+      line: { color: COLORS.red, width: 1, dashType: "dash" },
+      flipV: ay + 0.1 < 4.47,
     });
-    s.addText(k.value, {
-      x: rX + 0.05, y: y + 0.15, w: 1.1, h: 0.22,
-      fontFace: FONT_THAI, fontSize: 10,
-      color: COLORS.ink, align: "center", margin: 0,
+    s.addText(a.icon, {
+      x: ax, y: ay, w: 0.3, h: 0.2,
+      fontSize: 11, align: "center", valign: "middle", margin: 0,
+    });
+    s.addText(a.label, {
+      x: ax + 0.3, y: ay - 0.02, w: 1.4, h: 0.24,
+      fontFace: FONT_THAI, fontSize: 11,
+      color: COLORS.inkSoft, valign: "middle", margin: 0,
     });
   });
 
-  // Bottom: Use case callout
+  // Bottom callout
   s.addShape(pres.shapes.RECTANGLE, {
-    x: 0.5, y: 5.1, w: 9, h: 0.4,
+    x: 0.5, y: 5.05, w: 9, h: 0.45,
     fill: { color: COLORS.KUgreenDark }, line: { type: "none" },
   });
   s.addShape(pres.shapes.RECTANGLE, {
-    x: 0.5, y: 5.1, w: 0.12, h: 0.4,
+    x: 0.5, y: 5.05, w: 0.12, h: 0.45,
     fill: { color: COLORS.KUgold }, line: { type: "none" },
   });
   s.addText([
-    { text: "Use case มก. :  ", options: { color: COLORS.KUgold, bold: true } },
-    { text: "ผู้ช่วยอาจารย์ตอบคำถามนิสิต 24/7  —  ค้นจาก KU LLM + Vector DB (course materials) + ระบบทะเบียน", options: { color: COLORS.white } },
+    { text: "ของ มก. ครบ! :  ", options: { color: COLORS.KUgold, bold: true } },
+    { text: "Prompt = ผู้ใช้   •   LLM = ", options: { color: COLORS.white } },
+    { text: "apigw.ku.ac.th", options: { color: COLORS.KUgold, bold: true } },
+    { text: "   •   Planning = ", options: { color: COLORS.white } },
+    { text: "workflow.ku.ac.th", options: { color: COLORS.KUgold, bold: true } },
+    { text: "   •   Memory/Knowledge/Tools = KU data + APIs", options: { color: COLORS.white } },
   ], {
-    x: 0.75, y: 5.1, w: 9, h: 0.4,
-    fontFace: FONT_THAI, fontSize: 12,
+    x: 0.75, y: 5.05, w: 9, h: 0.45,
+    fontFace: FONT_THAI, fontSize: 11,
     valign: "middle", margin: 0,
   });
 
