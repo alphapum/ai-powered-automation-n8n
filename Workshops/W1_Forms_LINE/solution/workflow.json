@@ -38,30 +38,24 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://notify-api.line.me/api/notify",
+        "url": "https://api.line.me/v2/bot/message/push",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
-        "contentType": "form-urlencoded",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "message",
-              "value": "={{ $json.message }}"
-            }
-          ]
-        },
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"REPLACE_WITH_YOUR_LINE_USER_ID\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.message }}\"\n    }\n  ]\n}",
         "options": {}
       },
       "id": "n03-http-line",
-      "name": "HTTP Request (LINE Notify)",
+      "name": "HTTP Request (LINE Messaging API)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [720, 300],
       "credentials": {
         "httpHeaderAuth": {
           "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
-          "name": "LINE Notify - KU Workshop"
+          "name": "LINE Messaging API - KU Workshop"
         }
       }
     }
@@ -82,7 +76,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request (LINE Notify)",
+            "node": "HTTP Request (LINE Messaging API)",
             "type": "main",
             "index": 0
           }
@@ -97,7 +91,7 @@
   "versionId": "ku-workshop-2026-05-26",
   "meta": {
     "templateCreatedBy": "Amornpan Phornchaicharoen — KU Workshop 2026",
-    "description": "KU Workshop 1: Google Forms → LINE Notify. Replace LINE Notify credential ID after import. Apps Script snippet in GUIDE.md Step 3."
+    "description": "KU Workshop 1: Google Forms → LINE Messaging API. After import: (1) replace REPLACE_WITH_YOUR_LINE_USER_ID in HTTP Request jsonBody with your LINE user ID, (2) create Header Auth credential with your Channel Access Token. See GUIDE.md Step 6."
   },
   "tags": [
     {

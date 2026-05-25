@@ -213,38 +213,92 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 ---
 
-## Step 6: เพิ่ม LINE Notify Node (ส่งข้อความ) (10 นาที)
+## Step 6: เพิ่ม LINE Messaging API (ส่งข้อความ) (15 นาที)
 
-### 6.1 รับ LINE Notify Token
+> ⚠️ **LINE Notify ปิดบริการแล้ว** (31 มี.ค. 2568) — Workshop นี้ใช้ **LINE Messaging API** แทน
+>
+> ขั้นตอนยาวกว่า Notify เดิม แต่ยืดหยุ่นกว่า (ส่ง flex message, image, sticker ฯลฯ ได้)
 
-TA จะแจก **LINE Notify token** ให้ในห้อง (ของกลุ่มทดสอบ — ทุกคนใช้ token เดียวกันเพื่อความสะดวก)
+### 6.1 สมัคร LINE Developers + สร้าง Provider (3 นาที)
 
-> 💡 **Token หน้าตาประมาณ:** `XXXXXXXXXXXXXXXXXXXXXXXXXXXXX` (40 ตัวอักษร)
+1. เปิด **https://developers.line.biz**
+2. กด **Log in** (มุมขวาบน) → **Log in with LINE Account**
+3. ครั้งแรก: ยอมรับ Terms of Use
+4. ในหน้า Console → section **Providers** → กด **Create**
+5. Provider name: `KU Workshop [ชื่อคุณ]`
+6. กด **Create**
 
-ในกลุ่ม LINE ที่ TA สร้างไว้ ทุกคนเข้ากลุ่ม → ทุกข้อความที่ทุกคนส่ง จะเข้ามาในกลุ่มเดียวกัน
+> 💡 Provider = "องค์กร" ที่จะเป็นเจ้าของ Bot — ใช้ของตัวเองได้เลย
 
-### 6.2 เพิ่ม HTTP Request Node
+### 6.2 สร้าง Messaging API Channel (3 นาที)
 
-n8n รุ่น 2.12 ยังไม่มี LINE Notify node ในตัว — เราใช้ **HTTP Request** ส่งเองได้ง่ายๆ
+1. คลิกที่ Provider ที่เพิ่งสร้าง → tab **Channels**
+2. กด **Create a new channel** → เลือก **Messaging API**
+3. กรอกข้อมูล:
+   - **Channel name:** `KU-W1-[ชื่อคุณ]`
+   - **Channel description:** `Workshop Bot`
+   - **Category:** Education
+   - **Subcategory:** University
+   - **Region:** Thailand
+4. ยอมรับ Terms → **Create**
+
+### 6.3 รับ Channel Access Token (1 นาที)
+
+1. ในหน้า Channel ที่เพิ่งสร้าง → tab **Messaging API**
+2. เลื่อนลงหา section **Channel access token (long-lived)**
+3. กด **Issue** → token จะแสดง
+4. **Copy เก็บไว้** (ยาว ~170 ตัวอักษร)
+
+> ⚠️ **Token = รหัสผ่าน!** อย่า commit ขึ้น Git / share ในที่สาธารณะ
+> ถ้าหลุด → กด **Reissue** ทันที
+
+### 6.4 เพิ่ม Bot เป็นเพื่อน + หา User ID (3 นาที)
+
+**A. เพิ่ม Bot:**
+1. ใน tab Messaging API เลื่อนหา **QR code**
+2. เปิด LINE บนมือถือ → Home → Scan QR → scan QR ของ Bot
+3. กด **Add** — Bot จะเข้ามาในรายชื่อเพื่อน
+
+**B. หา User ID ของตัวเอง:**
+1. กลับไปที่ tab **Basic settings** ของ Channel
+2. เลื่อนหา **Your user ID** (ไม่ใช่ Bot user ID!)
+3. Copy: ขึ้นต้นด้วย `U` + ตัวเลข/ตัวอักษร 32 ตัว
+
+> ⚠️ **ระวัง 2 ID ต่างกัน:**
+> - **Your user ID** (ขึ้นต้น `U`) ← ใช้อันนี้!
+> - **Bot user ID** (ขึ้นต้น `@`) ← ไม่ใช่อันนี้
+
+### 6.5 เพิ่ม HTTP Request Node ใน n8n (5 นาที)
 
 1. ที่ Set node กดปุ่ม **`+`**
 2. ค้นหา **`HTTP Request`** → คลิก
 3. ตั้งค่า:
    - **Method:** `POST`
-   - **URL:** `https://notify-api.line.me/api/notify`
-   - **Authentication:** เลือก `Generic Credential Type` → `Header Auth`
-     - กด **Create New Credential** :
-       - Name: `LINE Notify - KU Workshop`
+   - **URL:** `https://api.line.me/v2/bot/message/push`
+   - **Authentication:** `Generic Credential Type` → `Header Auth`
+     - กด **Create New Credential**:
+       - **Name:** `LINE Messaging API - KU Workshop`
        - **Header Name:** `Authorization`
-       - **Header Value:** `Bearer XXXXX` (แทน XXXXX ด้วย token จาก TA)
+       - **Header Value:** `Bearer <Channel Access Token จาก 6.3>`
        - กด **Save**
    - **Send Body:** เปิด toggle
-   - **Body Content Type:** `Form-Urlencoded`
-   - **Body Parameters** → เพิ่ม 1 field:
-     - **Name:** `message`
-     - **Value:** `{{ $json.message }}` (ดึงจาก Set node)
+   - **Body Content Type:** `JSON`
+   - **Specify Body:** `Using JSON`
+   - **JSON:**
+     ```json
+     {
+       "to": "U1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6",
+       "messages": [
+         {
+           "type": "text",
+           "text": "{{ $json.message }}"
+         }
+       ]
+     }
+     ```
+   - **แทน `U1a2b3...` ด้วย Your user ID ของคุณ** (จาก Step 6.4)
 
-✅ **เช็ค:** ตั้งค่าครบทุกช่อง
+✅ **เช็ค:** ตั้งค่าครบทุกช่อง + ใส่ user ID ของตัวเองแล้ว
 
 ---
 
@@ -256,17 +310,20 @@ n8n รุ่น 2.12 ยังไม่มี LINE Notify node ในตัว 
    - ชื่อ: ใช้ชื่อจริงของคุณ
    - เรื่อง: เลือก `ขอใบรับรอง`
 4. ใน n8n ดู workflow ไหลผ่าน 3 nodes (Webhook → Set → HTTP Request) — ทุก node ขึ้นเขียว
-5. **เช็ค LINE กลุ่ม** — ภายใน 2-3 วินาที จะมีข้อความ:
+5. **เช็ค LINE ของตัวเอง** — เปิด chat กับ Bot `KU-W1-[ชื่อคุณ]`
+   ภายใน 2-3 วินาที จะมีข้อความ:
    ```
    📩 คำร้องใหม่จาก: [ชื่อจริงของคุณ]
    รหัส: 6500000
    เรื่อง: ขอใบรับรอง
+
+   รายละเอียด:
    ...
    ```
 
 🎉 **เสร็จแล้ว!** workflow แรกของคุณทำงานจริง
 
-✅ **เช็ค:** เห็นข้อความใน LINE กลุ่ม
+✅ **เช็ค:** เห็นข้อความใน chat ของ LINE Bot
 
 ---
 

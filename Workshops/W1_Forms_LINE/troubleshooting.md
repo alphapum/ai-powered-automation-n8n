@@ -103,29 +103,74 @@ const payload = {
 
 ---
 
-## ❌ LINE Notify ไม่ส่งข้อความ — Error 401 Unauthorized
+## ❌ LINE Messaging API: Error 401 Unauthorized
 
 **อาการ:** HTTP Request node ขึ้นแดง — error `401`
 
 **สาเหตุ + วิธีแก้:**
 
-1. **Token ผิด** — เช็คว่า:
-   - Header Name = `Authorization` (มี `n` ตัวเดียว ระวัง typo)
-   - Header Value = `Bearer XXXXX` — มีคำว่า `Bearer` เว้นวรรค แล้วตามด้วย token
-   - Token ไม่มี space หน้า/หลัง
-2. **Token หมดอายุ** — token ของ LINE Notify อยู่ตลอด (ไม่หมดอายุ) แต่ถ้า admin revoke จะใช้ไม่ได้ — แจ้ง TA
+1. **Channel Access Token ผิด/หมดอายุ** — เช็คใน LINE Developers Console:
+   - Channel → Messaging API tab → Channel access token
+   - กด **Reissue** เพื่อออก token ใหม่ → ใส่ใน credential ของ n8n
+2. **Header รูปแบบผิด** — ต้องเป็น:
+   - Header Name = `Authorization` (case-sensitive)
+   - Header Value = `Bearer ` + token (มีคำว่า Bearer เว้นวรรค 1 ครั้ง)
+   - ไม่มี space หน้า/หลัง
 
 ---
 
-## ❌ LINE Notify ไม่ส่งข้อความ — Error 400 Bad Request
+## ❌ LINE Messaging API: Error 400 Bad Request
 
 **อาการ:** HTTP Request node ขึ้นแดง — error `400`
 
 **สาเหตุ + วิธีแก้:**
 
-1. **ไม่ได้ใส่ field `message`** — LINE Notify บังคับต้องมี field ชื่อ `message`
-2. **Body type ผิด** — ต้องเป็น `Form-Urlencoded` (ไม่ใช่ JSON)
-3. **Message ว่าง** — ลองเช็คว่า `{{ $json.message }}` มีค่าจริง (ดูที่ Set node ก่อนหน้า)
+1. **JSON body ผิด format** — ต้องเป็น object ตามนี้เป๊ะ:
+   ```json
+   {
+     "to": "U1a2b3...",
+     "messages": [{"type": "text", "text": "ข้อความ"}]
+   }
+   ```
+2. **User ID ผิด** — `to` ต้องเริ่มด้วย `U` ไม่ใช่ `@`
+3. **Messages array ว่าง** — ต้องมีอย่างน้อย 1 message
+4. **`text` ว่าง** — เช็คว่า `{{ $json.message }}` มีค่าจริง (ดู Set node)
+5. **Content-Type ผิด** — ต้องเป็น `JSON` ไม่ใช่ `Form-Urlencoded`
+
+---
+
+## ❌ LINE Messaging API: Error 403 Forbidden (target user not friend)
+
+**อาการ:** HTTP Request ส่งสำเร็จแต่ LINE ไม่ขึ้นข้อความ — error `403`
+
+**สาเหตุ:** Bot ยังไม่เป็นเพื่อนกับ user ที่ระบุใน `to`
+
+**วิธีแก้:**
+1. เปิด LINE บนมือถือ → Home → Add friend
+2. เลือก **Scan QR** → scan QR ของ Bot (จาก Messaging API tab)
+3. กด **Add** เป็นเพื่อน
+4. ลองส่งใหม่
+
+> 💡 LINE Messaging API ส่งได้เฉพาะคนที่เป็นเพื่อนกับ Bot เท่านั้น (เพื่อป้องกัน spam)
+
+---
+
+## ❌ ใช้ User ID ผิด (Bot user ID vs Your user ID)
+
+**อาการ:** Bot ส่งข้อความ "ไปหาตัวเอง" หรือ error
+
+**สาเหตุ:** ใช้ Bot user ID (ขึ้นต้น `@`) แทน Your user ID (ขึ้นต้น `U`)
+
+**วิธีแก้:**
+- ใน Channel tab **Basic settings** → เลื่อนหา **Your user ID**
+- Copy ค่าที่ขึ้นต้นด้วย `U` + 32 ตัวอักษร
+- ใส่ค่านี้ใน `"to"` ของ JSON body
+
+| ID type | ขึ้นต้น | ใช้ตอนไหน |
+|---|---|---|
+| **Your user ID** | `U` + 32 ตัว | ปลายทาง (`to` ใน push API) ✅ |
+| Bot user ID | `@` หรือ `U` | สำหรับ user มา add friend |
+| Channel ID | ตัวเลข 10 หลัก | Identification ของ channel |
 
 ---
 
