@@ -365,14 +365,17 @@ const WEBHOOK_URL = "https://workflow.ku.ac.th/webhook-test/1a2b3c4d-5e6f-7g8h-9
 
 **สร้าง Credential (ขั้นตอน 5):**
 
-- กด **Set up credential** → กด **Create New**
-- ใส่:
-  - **Name:** `LINE Messaging API - KU Workshop`
-  - **Header Auth → Name:** `Authorization`
-  - **Header Auth → Value:** `Bearer <Channel Access Token จาก 6.4>`
-- กด **Save**
+- กด **Set up credential** — Dialog popup เปิด
+- ชื่อ default: `Header Auth account N` (อาจคลิกที่ชื่อด้านบนเพื่อ rename เป็น `LINE Messaging API - KU` ถ้าต้องการ)
+- กรอก **2 ช่อง** (UI ใหม่มีแค่ 2 ช่อง):
+  - **Name:** `Authorization` (= ชื่อ HTTP header)
+  - **Value:** `Bearer <Channel Access Token จาก 6.4>` (= ค่า header)
+- (ไม่ต้องแตะ) **Allowed HTTP Request Domains** → ปล่อยเป็น `All`
+- กด **Save** (ปุ่มแดงล่างซ้าย)
 
-> ⚠️ **สำคัญ:** ต้องเป็น `Bearer` (B ใหญ่) + เว้นวรรค 1 ครั้ง + Token เลย — ห้ามมี space หน้า/หลัง
+> ⚠️ **สำคัญ:** ในช่อง Value ต้องเป็น `Bearer` (B ใหญ่) + เว้นวรรค 1 ครั้ง + Token เลย — ห้ามมี space หน้า/หลัง
+>
+> 💡 **หมายเหตุ:** UI version ใหม่ของ n8n รวม "Name" (credential name) กับ "Header Name" ไม่ได้แยกเป็น 3 ช่องเหมือนเดิม — ใช้แค่ 2 ช่อง Name/Value โดย Name = ชื่อ HTTP header นั้นๆ
 
 **JSON Body (ขั้นตอน 9):**
 ```json
