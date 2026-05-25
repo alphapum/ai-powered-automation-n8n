@@ -162,6 +162,26 @@ Workshop 1 ของเราใช้ **Push API ทางเดียว** —
 
 ---
 
+## ❌ Invalid URL: must start with "http" or "https"
+
+**อาการ:** กด Execute step ใน HTTP Request → error:
+```
+Invalid URL: api.line.me/v2/bot/message/push.
+URL must start with "http" or "https".
+```
+
+**สาเหตุ:** ขาด `https://` ข้างหน้า URL
+
+**วิธีแก้:**
+- คลิกช่อง URL → ไปต้นข้อความ
+- เพิ่ม `https://` ข้างหน้า
+- URL ที่ถูก: `https://api.line.me/v2/bot/message/push`
+- กด Execute step อีกครั้ง
+
+> 💡 LINE Messaging API ใช้ HTTPS เท่านั้น — HTTP ใช้ไม่ได้
+
+---
+
 ## ❌ LINE Messaging API: Error 401 Unauthorized
 
 **อาการ:** HTTP Request node ขึ้นแดง — error `401`
