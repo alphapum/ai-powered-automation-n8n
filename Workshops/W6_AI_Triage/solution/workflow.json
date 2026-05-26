@@ -1,0 +1,96 @@
+{
+  "name": "mistral-test1",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        -144
+      ],
+      "id": "9041ec14-a83c-4db1-be60-f332df90a725",
+      "name": "When chat message received",
+      "webhookId": "9ee3cbdb-b5d2-4bb2-8456-55c5a1209b69"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a classification engine for Kasetsart University.\n\nGiven a Thai or English request, output ONLY valid JSON in this exact schema:\n\n{\n  \"category\": \"academic\" | \"finance\" | \"library\" | \"complaint\" | \"general\",\n  \"urgency\": \"low\" | \"medium\" | \"high\",\n  \"department\": \"registrar\" | \"finance_office\" | \"library\" | \"executive\" | \"general_helpdesk\",\n  \"summary_en\": \"<one sentence English summary, max 20 words>\",\n  \"keywords\": [\"<keyword1>\", \"<keyword2>\", \"<keyword3>\"]\n}\n\nRules:\n- Output ONLY the JSON object. No prose, no markdown, no explanation.\n- urgency=high if mentions: medical emergency, deadline today, financial crisis, harassment\n- If unsure about category → choose \"general\"\n\nExample input: \"อยากขอใบรับรองด่วน พรุ่งนี้ต้องใช้สมัครงาน\"\nExample output:\n{\n  \"category\": \"academic\",\n  \"urgency\": \"high\",\n  \"department\": \"registrar\",\n  \"summary_en\": \"Student urgently needs official transcript by tomorrow for job application\",\n  \"keywords\": [\"transcript\", \"urgent\", \"job_application\"]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        -144
+      ],
+      "id": "dec226da-f027-457b-a0b6-aba2f64f2978",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=mistralai/Mistral-7B-Instruct-v0.3",
+          "mode": "id"
+        },
+        "responsesApiEnabled": "",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        64
+      ],
+      "id": "41a0a925-97e7-4eb5-9855-16f86599b0e0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "5duVfqs1Oa61h4TB",
+          "name": "KU-LLM-GW"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1b9bd2bc-4772-4c34-8ee2-d9d2dff09351",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed560fedb651e6fd6c7e2ce7ec8fe4450c85606f704571f86ba4f77449c80a59"
+  },
+  "id": "2f3IhhWLlNyrusKm",
+  "tags": []
+}
